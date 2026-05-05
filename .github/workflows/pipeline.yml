@@ -1,15 +1,25 @@
-name: Test Budowania Dockera
-on: [push]
+name: Build and Push AI Image
+
+on:
+  push:
+    branches: [ main ]
 
 jobs:
-  test-build:
+  build-and-push:
     runs-on: ubuntu-latest
     steps:
-      - name: Pobierz kod z repozytorium
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Zbuduj obraz Docker
-        run: docker build -t moj-testowy-skrypt .
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Uruchom kontener i sprawdz czy dziala
-        run: docker run moj-testowy-skrypt
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: orebah/ai-test:latest
